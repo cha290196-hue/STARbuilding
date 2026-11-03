@@ -1,6 +1,8 @@
-# STARbuilding
+<p align="center"><img src="assets/banner.svg" alt="STARbuilding 遥感影像建筑物标注" width="100%"></p>
 
-**遥感影像建筑物标注工具**
+<h1 align="center">STARbuilding</h1>
+<p align="center">遥感影像建筑物标注工作台</p>
+<p align="center"><b>双时相对照</b>　·　<b>交互式分割</b>　·　<b>轮廓修订</b>　·　<b>掩膜导出</b></p>
 
 从建筑轮廓绘制到二值掩膜导出，围绕前后时相影像构建轻量的标注工作流。
 
@@ -8,11 +10,11 @@
 
 ## 当前网页功能
 
-- 导入前、后时相影像，支持单图、左右对照和叠加查看。
+- 分别批量导入前、后时相影像并切换，支持单图、左右对照和叠加查看。
 - 逐点绘制建筑物轮廓，选择并拖动顶点，撤销或删除标注。
 - 使用浏览器端 SlimSAM 模型，以点击方式辅助生成轮廓。
 - 按当前影像原始尺寸导出仅含 0 和 255 的黑白 PNG 掩膜。
-- 将轮廓保存为 JSON 工程；恢复时需要重新选择同尺寸的原始影像。
+- 将当前选中的前、后时相轮廓保存为 JSON 工程；其他影像需逐组保存。恢复时需要重新选择同尺寸的原始影像。
 
 智能分割是交互辅助工具，结果必须逐个检查。模型可能分割出背景或较大的区域，其评分也不能直接解释为可靠的准确率。
 
@@ -21,7 +23,7 @@
 在仓库根目录启动本地静态服务器：
 
 ```bash
-python -m http.server 8000 --directory web
+python -m http.server 8000 --directory docs
 ```
 
 在浏览器打开 `http://localhost:8000/`。首次点击智能分割时，浏览器需要连接 CDN 和模型托管服务，下载运行库与模型文件；实际推理在浏览器内进行，导入的影像不会被本程序上传。网络不可用时仍可使用手工标注。
@@ -41,4 +43,4 @@ python -m http.server 8000 --directory web
 
 ## 原桌面版本
 
-`run.py` 是原始 PyQt/SAM 实现，尚未删除。它依赖 Python、PyQt5、OpenCV、PyTorch、Segment Anything 和单独的 SAM 权重。网页重构目前没有完整覆盖原程序的影像列表、批量切换与自由标注窗口，后续仍需完善和验证。
+`run.py` 是原始 PyQt/SAM 实现，尚未删除。它依赖 Python、PyQt5、OpenCV、PyTorch、Segment Anything 和单独的 SAM 权重。网页重构目前尚未覆盖原程序的独立自由标注窗口等功能，后续仍需完善和验证。
