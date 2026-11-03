@@ -1,52 +1,74 @@
-<p align="center"><img src="assets/banner.svg" alt="STARbuilding 遥感影像建筑物标注" width="100%"></p>
+<p align="center">
+  <img src="assets/banner.svg" alt="STARbuilding" width="100%">
+</p>
 
-<h1 align="center">STARbuilding</h1>
-<p align="center">遥感影像建筑物标注工作台</p>
-<p align="center"><b>双时相对照</b>　·　<b>交互式分割</b>　·　<b>轮廓修订</b>　·　<b>掩膜导出</b></p>
+<p align="center"><strong>遥感影像建筑物标注工具</strong></p>
+<p align="center">双时相影像　/　交互式标注　/　二值掩膜导出</p>
+<p align="center"><a href="https://cha290196-hue.github.io/STARbuilding/"><strong>打开在线工作台 ↗</strong></a></p>
 
-从建筑轮廓绘制到二值掩膜导出，围绕前后时相影像构建轻量的标注工作流。
+<br>
 
-<p align="center"><a href="https://cha290196-hue.github.io/STARbuilding/"><b>打开在线工作台 →</b></a></p>
+## 工作台
 
-![标注工作台，图中为人工构造的测试影像](assets/workspace.jpg)
+![STARbuilding 标注工作台](assets/workspace.jpg)
 
 <sub>界面截图使用人工构造的测试影像。</sub>
 
-> 当前网页重构仍在验证中。原始桌面程序保留在 `run.py`；请勿将网页版本视为全部功能已经迁移完成的正式版本。
+STARbuilding 是一个运行在浏览器中的遥感影像标注工具。导入影像后，可以绘制或辅助生成建筑物轮廓，调整边界，并导出同尺寸的二值掩膜。
 
-## 当前网页功能
+| 影像管理 | 建筑物标注 | 导出与保存 |
+| :--- | :--- | :--- |
+| 前、后时相影像分别导入 | 逐点绘制多边形 | 黑白 PNG 二值掩膜 |
+| 多张影像切换 | 点击辅助分割 | JSON 标注工程 |
+| 单图、左右和叠加视图 | 顶点编辑、撤销与删除 | 保持源影像像素尺寸 |
 
-- 分别批量导入前、后时相影像并切换，支持单图、左右对照和叠加查看。
-- 逐点绘制建筑物轮廓，选择并拖动顶点，撤销或删除标注。
-- 使用浏览器端 SlimSAM 模型，以点击方式辅助生成轮廓。
-- 按当前影像原始尺寸导出仅含 0 和 255 的黑白 PNG 掩膜。
-- 将当前选中的前、后时相轮廓保存为 JSON 工程；其他影像需逐组保存。恢复时需要重新选择同尺寸的原始影像。
+## 开始使用
 
-智能分割是交互辅助工具，结果必须逐个检查。模型可能分割出背景或较大的区域，其评分也不能直接解释为可靠的准确率。
+1. 打开 [在线工作台](https://cha290196-hue.github.io/STARbuilding/)，导入前时相影像；需要对照时再导入后时相影像。
+2. 选择 **绘制轮廓**，沿建筑边界依次点击，按 `Enter` 或双击结束；也可以选择 **智能分割**，点击目标生成轮廓。
+3. 选择 **选择编辑**，点击已有轮廓并拖动顶点修正；使用滚轮缩放，切换到 **移动画布** 可拖动画面。
+4. 选择当前时相，导出 **PNG 二值掩膜**，或保存 **JSON 标注工程**。
 
-## 本地运行网页
+首次使用智能分割时需要联网下载模型和运行组件。推理在浏览器中执行，影像不由本程序上传。模型结果需要人工检查，手工标注无需加载模型。
 
-在仓库根目录启动本地静态服务器：
+## 文件与数据
+
+- **影像格式：**PNG、JPEG、WebP 和 BMP。可同时选择多张影像，并在列表中切换。
+- **掩膜格式：**与当前影像尺寸一致的 PNG，背景为 `0`，标注区域为 `255`。
+- **工程保存：**JSON 保存当前选中的前、后时相轮廓，不包含影像文件；恢复时请先重新导入对应的同尺寸影像。列表中的其他影像需要分别保存。
+- **叠加对照：**要求两张影像尺寸一致并已事先配准；程序不执行自动配准。
+- **面积：**以像素平方为单位，不代表地面实际面积。
+
+## 快捷键
+
+| 按键 | 操作 |
+| :--- | :--- |
+| `Enter` | 完成当前轮廓 |
+| `Esc` | 取消当前绘制 |
+| `Ctrl` / `⌘` + `Z` | 撤销 |
+| `Delete` / `Backspace` | 删除选中轮廓 |
+| 鼠标滚轮 | 缩放画布 |
+
+## 本地运行
+
+需要 Python 3 提供静态文件服务：
 
 ```bash
 python -m http.server 8000 --directory docs
 ```
 
-在浏览器打开 `http://localhost:8000/`。首次点击智能分割时，浏览器需要连接 CDN 和模型托管服务，下载运行库与模型文件；实际推理在浏览器内进行，导入的影像不会被本程序上传。网络不可用时仍可使用手工标注。
+在浏览器访问 `http://localhost:8000/`。网页入口为 `docs/index.html`。智能分割使用 [Transformers.js](https://github.com/huggingface/transformers.js) 和 [SlimSAM ONNX 模型](https://huggingface.co/Xenova/slimsam-77-uniform)，相关组件及模型的使用遵循各自许可。
 
-## 操作
+## 项目结构
 
-1. 导入前时相影像，按需导入后时相。
-2. 选择绘制轮廓，在建筑边界依次点击，按 Enter 完成；或选择智能分割并点击目标。
-3. 通过「选择编辑」拖动轮廓顶点，检查并修正分割结果。
-4. 切换当前时相导出对应的黑白 PNG 掩膜，或保存 JSON 工程。
-
-叠加查看要求两幅图像尺寸一致且已经完成配准；程序不会自动配准。面积以像素计，并非实际地面面积。
-
-## 模型与依赖
-
-网页使用 [Transformers.js](https://github.com/huggingface/transformers.js) 和 [SlimSAM ONNX 权重](https://huggingface.co/Xenova/slimsam-77-uniform)，权重的量化编码器与解码器合计约 14 MB。模型并非专门针对所有遥感建筑数据训练；尚未在本项目的标注集上与原桌面版模型进行准确率和速度对比。模型和运行库的使用应遵循各自许可。
-
-## 原桌面版本
-
-`run.py` 是原始 PyQt/SAM 实现，尚未删除。它依赖 Python、PyQt5、OpenCV、PyTorch、Segment Anything 和单独的 SAM 权重。网页重构目前尚未覆盖原程序的独立自由标注窗口等功能，后续仍需完善和验证。
+```text
+STARbuilding/
+├── docs/                 在线工作台
+│   ├── index.html        页面结构
+│   ├── style.css         界面样式
+│   ├── app.js            标注与导出逻辑
+│   └── icon.svg          项目标识
+├── assets/               README 图片
+├── run.py                原始源码
+└── README.md
+```
